@@ -7,4 +7,6 @@ public interface WpService {
     Object parseList(ParseCopyLink parse);
 
     Object parseLink(ParseLink parse);
+
+    Object getSign(ParseCopyLink parse);
 }

@@ -26,9 +26,16 @@ public class WpController extends BaseController {
 
     @PostMapping("/parseLink")
     public R parseLink(@RequestBody ParseLink parse) {
-        Object result =  wpService.parseLink(parse);
+        Object o = wpService.parseLink(parse);
+        return R.ok(o);
+    }
+
+    @PostMapping("/getSign")
+    public R getSign(@RequestBody ParseCopyLink parse) {
+        Object result =  wpService.getSign(parse);
         return R.ok(result);
     }
+
 
 
 }

@@ -12,4 +12,5 @@ public class ParseLink {
     private String surl;
     private String pwd;
     private String uk;
+    private String code;
 }
