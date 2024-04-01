@@ -2,6 +2,8 @@ package com.ruoyi.web.wp.controller;
 
 import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.R;
+import com.ruoyi.common.core.redis.RedisCache;
+import com.ruoyi.web.wp.dto.Code;
 import com.ruoyi.web.wp.dto.ParseCopyLink;
 import com.ruoyi.web.wp.dto.ParseLink;
 import com.ruoyi.web.wp.service.WpService;
@@ -11,6 +13,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import javax.validation.Valid;
+import java.util.concurrent.TimeUnit;
 
 @RestController
 @RequestMapping("wp")
@@ -18,6 +22,8 @@ public class WpController extends BaseController {
 
     @Resource
     private WpService wpService;
+    @Resource
+    private RedisCache redisCache;
     @PostMapping("/parseCopyLink")
     public R parseCopyLink(@RequestBody ParseCopyLink parse) {
        Object result =  wpService.parseList(parse);
@@ -31,9 +37,20 @@ public class WpController extends BaseController {
     }
 
     @PostMapping("/getSign")
-    public R getSign(@RequestBody ParseCopyLink parse) {
+    public R getSign(@RequestBody @Valid ParseCopyLink parse) {
         Object result =  wpService.getSign(parse);
         return R.ok(result);
+    }
+
+    @PostMapping("/setCode")
+    public R setCode(@RequestBody Code code)  {
+        redisCache.setCacheObject(code.getCode(),"5",15, TimeUnit.MINUTES);
+        return R.ok("success");
+    }
+
+    @PostMapping("/getCodeNum")
+    public R getCodeNum(@RequestBody Code code)  {
+        return R.ok( redisCache.getCacheObject(code.getCode()).toString());
     }
 
 

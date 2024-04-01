@@ -40,6 +40,12 @@ public class VipController extends BaseController {
         return getDataTable(this.vipService.selectList());
     }
 
+    @GetMapping("/num")
+    public R selectVipNum() {
+        List<Vip> vips = this.vipService.selectVipList();
+        return R.ok(vips.size());
+    }
+
     /**
      * 通过主键查询单条数据
      *

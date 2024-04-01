@@ -49,11 +49,11 @@ public class WpServiceImpl implements WpService {
         //大于设定次数直接返回
       String userCode =  parse.getCode();
         Object codeNum = redisCache.getCacheObject(userCode);
-        if(Integer.parseInt(codeNum.toString()) > 5){
+        if("0".equals(codeNum.toString())){
             ParseResult parseResult = new ParseResult();
             parseResult.setErrno("0");
             parseResult.setCode(userCode);
-            parseResult.setCodeUseNum("100");
+            parseResult.setCodeUseNum("0");
             redisCache.deleteObject(userCode);
             return parseResult;
         }
@@ -91,18 +91,25 @@ public class WpServiceImpl implements WpService {
         String errno = bean.getErrno();
         String realLink = null;
         if(Objects.equals(errno, "0")){
+            //接口正确，获取真实链接
             ArrayList<Link> list = bean.getList();
             Link link = list.get(0);
             String dlink = link.getDlink();
             realLink = getRealLink(dlink);
         }else{
+            //错误直接返回
             return bean;
         }
-        int currentNum = Integer.parseInt(codeNum.toString()) + 1;
+        //真是链接返回null 直接返回
+        if(realLink == null){
+            return bean;
+        }
+        //下载次数加1
+        int currentNum = Integer.parseInt(codeNum.toString()) - 1;
         bean.setRealLink(realLink);
         bean.setCode(userCode);
         bean.setCodeUseNum(currentNum+"");
-        redisCache.setCacheObject(userCode,currentNum+"");
+        redisCache.setCacheObject(userCode,currentNum);
         return bean;
     }
     public String getBduss(String cookie){
@@ -121,18 +128,23 @@ public class WpServiceImpl implements WpService {
             return null;
         }else{
             Random random = new Random();
-            int i = random.nextInt(list.size());
-            Vip vip = list.get(i);
+            int size = list.size();
+            int randomIndex = random.nextInt(size);
+            Vip vip = list.get(randomIndex);
             cookie = vip.getCookie();
         }
         String bduss = getBduss(cookie);
         String realLink = null;
-        HttpRequest header = HttpRequest.head(dlink)
-                .header("User-Agent", "LogStatistic")
-                .header("Cookie", bduss);
-        HttpResponse execute = header.execute();
-        List<String> location = execute.headers().get("Location");
-        realLink = location.get(0);
+        try {
+            HttpRequest header = HttpRequest.head(dlink)
+                    .header("User-Agent", "LogStatistic")
+                    .header("Cookie", bduss);
+            HttpResponse execute = header.execute();
+            List<String> location = execute.headers().get("Location");
+            realLink = location.get(0);
+        } catch (Exception e) {
+            return realLink;
+        }
         if(!realLink.contains("tsl=0") || realLink.contains("qdall01")){
             QueryWrapper<Vip> vipQueryWrapper = new QueryWrapper<>();
             vipQueryWrapper.eq("cookie", cookie);
