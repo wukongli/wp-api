@@ -50,7 +50,13 @@ public class WpController extends BaseController {
 
     @PostMapping("/getCodeNum")
     public R getCodeNum(@RequestBody Code code)  {
-        return R.ok( redisCache.getCacheObject(code.getCode()).toString());
+        try {
+            Object cacheObject = redisCache.getCacheObject(code.getCode());
+            return R.ok(cacheObject.toString() );
+
+        } catch (Exception e) {
+            return R.ok("验证码不正确");
+        }
     }
 
 

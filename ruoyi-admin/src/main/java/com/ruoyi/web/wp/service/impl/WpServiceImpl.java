@@ -104,11 +104,11 @@ public class WpServiceImpl implements WpService {
         if(realLink == null){
             return bean;
         }
-        //下载次数加1
+        //下载次数减1
         int currentNum = Integer.parseInt(codeNum.toString()) - 1;
         bean.setRealLink(realLink);
         bean.setCode(userCode);
-        bean.setCodeUseNum(currentNum+"");
+        bean.setCodeUseNum(codeNum.toString());
         redisCache.setCacheObject(userCode,currentNum);
         return bean;
     }
