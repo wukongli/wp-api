@@ -85,7 +85,7 @@ public class VipController extends BaseController {
      * @param idList 主键结合
      * @return 删除结果
      */
-    @DeleteMapping
+    @DeleteMapping()
     public R delete(@RequestParam("idList") List<Long> idList) {
         return R.ok(this.vipService.removeByIds(idList));
     }

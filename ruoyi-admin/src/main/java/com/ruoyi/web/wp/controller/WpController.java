@@ -44,7 +44,7 @@ public class WpController extends BaseController {
 
     @PostMapping("/setCode")
     public R setCode(@RequestBody Code code)  {
-        redisCache.setCacheObject(code.getCode(),"5",15, TimeUnit.MINUTES);
+        redisCache.setCacheObject(code.getCode(),"5",1, TimeUnit.DAYS);
         return R.ok("success");
     }
 
