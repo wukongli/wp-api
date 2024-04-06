@@ -33,5 +33,12 @@ public class VipServiceImpl extends ServiceImpl<VipMapper, Vip> implements VipSe
         vipQueryWrapper.eq("status", 0);
         return vipDao.selectList(vipQueryWrapper);
     }
+
+    @Override
+    public List<Vip> selectCommonList() {
+        QueryWrapper<Vip> vipQueryWrapper = new QueryWrapper<>();
+        vipQueryWrapper.eq("status", 2);
+        return vipDao.selectList(vipQueryWrapper);
+    }
 }
 

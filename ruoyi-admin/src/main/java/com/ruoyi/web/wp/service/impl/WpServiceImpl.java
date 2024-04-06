@@ -30,8 +30,9 @@ public class WpServiceImpl implements WpService {
 
     @Override
     public Object parseList(ParseCopyLink parse) {
-        Object cookie = redisCache.getCacheObject("cookie");
-        String bduss = getBduss(cookie.toString());
+        String code = parse.getCode();
+        String cookie = getCommonCookie(code);
+        String bduss = getBduss(cookie);
         //普通账号cookie
         String url = "https://pan.baidu.com/share/wxlist?channel=weixin&version=2.2.2&clienttype=25&web=1";
         HttpRequest request = HttpRequest.post(url)
@@ -59,7 +60,7 @@ public class WpServiceImpl implements WpService {
         }
 
         //使用普通cookie 获取dlink 地址。
-        Object cookie = redisCache.getCacheObject("cookie");
+        String cookie = getCommonCookie(userCode);
         String sign = parse.getSign();
         String timestamp = parse.getTimestamp();
         String fsId = parse.getFs_id();
@@ -75,7 +76,7 @@ public class WpServiceImpl implements WpService {
         String url = "https://pan.baidu.com/api/sharedownload?app_id=250528&channel=chunlei&clienttype=12&sign="+sign+"&timestamp="+timestamp+"&web=1";
         HttpRequest request = HttpRequest.post(url)
                 .header("User-Agent","Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36 Edg/110.0.1587.69")
-                .header("Cookie",cookie.toString())
+                .header("Cookie", cookie)
                 .header("Referer","https://pan.baidu.com/disk/home");
         request.form("encrypt",0)
                 .form("extra",extra)
@@ -159,15 +160,25 @@ public class WpServiceImpl implements WpService {
         return realLink;
     }
 
+    public String getCommonCookie(String code){
+        char lastChar = code.charAt(code.length() - 1);
+        int num = Integer.parseInt(String.valueOf(lastChar));
+        String index = num >= 5 ? "1" : "2";
+        String key = "cookie-" + index;
+        Object cookie = redisCache.getCacheObject(key);
+        return cookie.toString();
+    }
+
 
     @Override
     public Object getSign(ParseCopyLink parse) {
         String shorturl = parse.getShorturl();
-        Object cookie = redisCache.getCacheObject("cookie");
+        String code = parse.getCode();
+        String cookie = getCommonCookie(code);
         String url = "https://pan.baidu.com/share/tplconfig?&surl="+shorturl+"&shareid=&uk=&fields=sign,timestamp&channel=chunlei&web=1&app_id=250528&clienttype=0";
         HttpRequest request = HttpRequest.get(url)
                 .header("User-Agent","netdisk;pan.baidu.com")
-                .header("Cookie",cookie.toString());
+                .header("Cookie",cookie);
        return JSON.parse(request.execute().body());
     }
 }

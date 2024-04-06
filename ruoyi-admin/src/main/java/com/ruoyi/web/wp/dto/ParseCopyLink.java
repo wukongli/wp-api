@@ -8,4 +8,5 @@ public class ParseCopyLink {
     private String dir;
     private String root;
     private String pwd;
+    private String code;
 }

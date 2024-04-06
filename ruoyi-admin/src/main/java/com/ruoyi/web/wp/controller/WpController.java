@@ -14,6 +14,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
 @RestController
@@ -44,7 +48,13 @@ public class WpController extends BaseController {
 
     @PostMapping("/setCode")
     public R setCode(@RequestBody Code code)  {
-        redisCache.setCacheObject(code.getCode(),"5",1, TimeUnit.DAYS);
+        String code1 = code.getCode();
+
+        if(code1.contains("V")){
+            redisCache.setCacheObject(code1,"10000");
+        }else{
+            redisCache.setCacheObject(code1,"5",1, TimeUnit.DAYS);
+        }
         return R.ok("success");
     }
 

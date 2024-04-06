@@ -15,5 +15,7 @@ public interface VipService extends IService<Vip> {
 
     List<Vip> selectList();
     List<Vip> selectVipList();
+
+    List<Vip> selectCommonList();
 }
 
