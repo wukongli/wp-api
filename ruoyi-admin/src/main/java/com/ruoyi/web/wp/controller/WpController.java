@@ -4,6 +4,7 @@ import com.ruoyi.common.core.controller.BaseController;
 import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.core.redis.RedisCache;
 import com.ruoyi.web.wp.dto.Code;
+import com.ruoyi.web.wp.dto.Cookie;
 import com.ruoyi.web.wp.dto.ParseCopyLink;
 import com.ruoyi.web.wp.dto.ParseLink;
 import com.ruoyi.web.wp.service.WpService;
@@ -57,6 +58,14 @@ public class WpController extends BaseController {
         }
         return R.ok("success");
     }
+
+    @PostMapping("/setCookie")
+    public R setCookie(@RequestBody Cookie cookie)  {
+        String code = cookie.getCookie();
+        redisCache.setCacheObject("cookie-1",code);
+        return R.ok("success");
+    }
+
 
     @PostMapping("/getCodeNum")
     public R getCodeNum(@RequestBody Code code)  {

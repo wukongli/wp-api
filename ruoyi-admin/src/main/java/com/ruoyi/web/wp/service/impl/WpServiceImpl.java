@@ -65,7 +65,7 @@ public class WpServiceImpl implements WpService {
         String timestamp = parse.getTimestamp();
         String fsId = parse.getFs_id();
         String uk = parse.getUk();
-        String randsk = parse.getRandsk();
+        String randsk = parseSk(parse.getRandsk());
         if(randsk.contains("%")){
             randsk = URLDecoder.decode(randsk);
         }
@@ -167,6 +167,14 @@ public class WpServiceImpl implements WpService {
         String key = "cookie-" + index;
         Object cookie = redisCache.getCacheObject(key);
         return cookie.toString();
+    }
+
+    public String parseSk(String seckey){
+        String s = seckey.replaceAll("-", "+");
+        String s1 = s.replaceAll("~", "=");
+        String s2 = s1.replaceAll("_", "/");
+        String encode = URLEncoder.encode(s2);
+        return encode;
     }
 
 
