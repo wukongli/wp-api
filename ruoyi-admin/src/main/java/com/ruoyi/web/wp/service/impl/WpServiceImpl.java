@@ -62,30 +62,37 @@ public class WpServiceImpl implements WpService {
         //使用普通cookie 获取dlink 地址。
         String cookie = getCommonCookie(userCode);
         String sign = parse.getSign();
+//        String sign = "7b3848965e98b3ca0717e3a2744f95a151e6cca3";
         String timestamp = parse.getTimestamp();
+//        String timestamp = "1714094010";
         String fsId = parse.getFs_id();
         String uk = parse.getUk();
         String randsk = parseSk(parse.getRandsk());
+        String shareid = parse.getShareid();
         if(randsk.contains("%")){
             randsk = URLDecoder.decode(randsk);
         }
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.append("sekey",randsk);
-        String extra = URLEncoder.encode(jsonObject.toString());
-        String shareid = parse.getShareid();
+        String str = "{" +
+                    "\"sekey\":\""+randsk+"\"" +
+                "}";
+//        String str = "{"+"sekey"+":"+randsk+"}";
+//        JSONObject jsonObject = new JSONObject();
+//        jsonObject.append("sekey",randsk);
+        String extra = URLEncoder.encode(str);
         String url = "https://pan.baidu.com/api/sharedownload?app_id=250528&channel=chunlei&clienttype=12&sign="+sign+"&timestamp="+timestamp+"&web=1";
         HttpRequest request = HttpRequest.post(url)
                 .header("User-Agent","Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36 Edg/110.0.1587.69")
                 .header("Cookie", cookie)
                 .header("Referer","https://pan.baidu.com/disk/home");
-        request.form("encrypt",0)
-                .form("extra",extra)
-                .form("fid_list","["+fsId+"]")
-                .form("primaryid",shareid)
-                .form("uk",uk)
-                .form("product","share")
-                .form("type","nolimit");
-        request.contentType("application/x-www-form-urlencoded");
+        String params  = "encrypt=0&extra="+extra+"&fid_list="+"["+fsId+"]"+"&primaryid="+shareid+"&uk="+uk+"&product=share&type=nolimit";
+        request.body(params);
+//        request.form("encrypt",0)
+//                .form("extra",extra)
+//                .form("fid_list","["+fsId+"]")
+//                .form("primaryid",shareid)
+//                .form("uk",uk)
+//                .form("product","share")
+//                .form("type","nolimit");
         JSONObject jsonObject1 = JSONUtil.parseObj(request.execute().body());
 
         ParseResult bean = jsonObject1.toBean(ParseResult.class);
@@ -170,9 +177,9 @@ public class WpServiceImpl implements WpService {
     }
 
     public String parseSk(String seckey){
-        String s = seckey.replaceAll("-", "+");
-        String s1 = s.replaceAll("~", "=");
-        String s2 = s1.replaceAll("_", "/");
+        String s = seckey.replace("-", "+");
+        String s1 = s.replace("~", "=");
+        String s2 = s1.replace("_", "/");
         String encode = URLEncoder.encode(s2);
         return encode;
     }
@@ -183,7 +190,8 @@ public class WpServiceImpl implements WpService {
         String shorturl = parse.getShorturl();
         String code = parse.getCode();
         String cookie = getCommonCookie(code);
-        String url = "https://pan.baidu.com/share/tplconfig?&surl="+shorturl+"&shareid=&uk=&fields=sign,timestamp&channel=chunlei&web=1&app_id=250528&clienttype=0";
+        String url = "https://pan.baidu.com/share/tplconfig?&surl="+shorturl+"&fields=sign,timestamp&channel=chunlei&web=1&app_id=250528&clienttype=0";
+//        String url = "https://pan.baidu.com/share/tplconfig?&surl="+shorturl+"&shareid=&uk=&fields=sign,timestamp&channel=chunlei&web=1&app_id=250528&clienttype=0";
         HttpRequest request = HttpRequest.get(url)
                 .header("User-Agent","netdisk;pan.baidu.com")
                 .header("Cookie",cookie);
