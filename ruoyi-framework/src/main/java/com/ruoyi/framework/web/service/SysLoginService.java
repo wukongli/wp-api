@@ -1,6 +1,10 @@
 package com.ruoyi.framework.web.service;
 
 import javax.annotation.Resource;
+
+import cn.hutool.core.date.DateTime;
+import cn.hutool.core.date.DateUtil;
+import com.ruoyi.common.utils.SecurityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -28,6 +32,9 @@ import com.ruoyi.framework.manager.factory.AsyncFactory;
 import com.ruoyi.framework.security.context.AuthenticationContextHolder;
 import com.ruoyi.system.service.ISysConfigService;
 import com.ruoyi.system.service.ISysUserService;
+
+import java.util.Date;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 登录校验方法
@@ -95,9 +102,20 @@ public class SysLoginService
         }
         AsyncManager.me().execute(AsyncFactory.recordLogininfor(username, Constants.LOGIN_SUCCESS, MessageUtils.message("user.login.success")));
         LoginUser loginUser = (LoginUser) authentication.getPrincipal();
+//        Date startDate = loginUser.getUser().getCreateTime();
+//        DateTime endDate = DateUtil.date();
+//
+//        DateTime start = DateUtil.parse(DateUtil.formatDateTime(startDate));
+//        DateTime end = DateUtil.parse(DateUtil.formatDateTime(endDate));
+//        long num = DateUtil.betweenDay(start, end,true);
+//        String remark = loginUser.getUser().getRemark();
+//
+//        if(num >= Integer.parseInt(remark)){
+//            return "会员已到期";
+//        }
         recordLoginInfo(loginUser.getUserId());
-        // 生成token
         return tokenService.createToken(loginUser);
+        // 生成token
     }
 
     public String loginNoPwd(String username, String password)

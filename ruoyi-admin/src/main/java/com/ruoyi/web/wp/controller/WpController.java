@@ -49,7 +49,7 @@ public class WpController extends BaseController {
         if(code1.contains("V")){
             redisCache.setCacheObject(code1,"10000");
         }else{
-            redisCache.setCacheObject(code1,"3",1, TimeUnit.DAYS);
+            redisCache.setCacheObject(code1,"5",1, TimeUnit.DAYS);
         }
         return R.ok("success");
     }

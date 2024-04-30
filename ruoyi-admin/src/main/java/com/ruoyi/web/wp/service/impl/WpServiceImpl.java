@@ -7,6 +7,7 @@ import cn.hutool.json.JSONUtil;
 import com.alibaba.fastjson2.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.ruoyi.common.core.redis.RedisCache;
+import com.ruoyi.common.utils.SecurityUtils;
 import com.ruoyi.web.wp.dto.Link;
 import com.ruoyi.web.wp.dto.ParseCopyLink;
 import com.ruoyi.web.wp.dto.ParseLink;
@@ -19,6 +20,7 @@ import javax.annotation.Resource;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 @Service
 public class WpServiceImpl implements WpService {
@@ -30,6 +32,11 @@ public class WpServiceImpl implements WpService {
 
     @Override
     public Object parseList(ParseCopyLink parse) {
+        Long userId = SecurityUtils.getUserId();
+        Object downLoadNum = redisCache.getCacheObject(String.valueOf(userId));
+        if(downLoadNum == null){
+            redisCache.setCacheObject(String.valueOf(userId),0,1, TimeUnit.DAYS);
+        }
         String code = parse.getCode();
         String cookie = getCommonCookie(code);
         String bduss = getBduss(cookie);
@@ -48,17 +55,23 @@ public class WpServiceImpl implements WpService {
     @Override
     public ParseResult parseLink(ParseLink parse) {
         //大于设定次数直接返回
-      String userCode =  parse.getCode();
+        String userCode =  parse.getCode();
+        Long userid = SecurityUtils.getUserId();
+
         Object codeNum = redisCache.getCacheObject(userCode);
+        Object downLoadNum = redisCache.getCacheObject(String.valueOf(userid));
+        ParseResult parseResult = new ParseResult();
+        parseResult.setErrno("0");
+        parseResult.setCode(userCode);
         if("0".equals(codeNum.toString())){
-            ParseResult parseResult = new ParseResult();
-            parseResult.setErrno("0");
-            parseResult.setCode(userCode);
             parseResult.setCodeUseNum("0");
             redisCache.deleteObject(userCode);
             return parseResult;
         }
-
+        if(Integer.parseInt(downLoadNum.toString()) >= 40){
+            parseResult.setCodeUseNum("40");
+            return parseResult;
+        }
         //使用普通cookie 获取dlink 地址。
         String cookie = getCommonCookie(userCode);
         String sign = parse.getSign();
@@ -108,7 +121,7 @@ public class WpServiceImpl implements WpService {
             //错误直接返回
             return bean;
         }
-        //真是链接返回null 直接返回
+        //真实链接返回null 直接返回
         if(realLink == null){
             return bean;
         }

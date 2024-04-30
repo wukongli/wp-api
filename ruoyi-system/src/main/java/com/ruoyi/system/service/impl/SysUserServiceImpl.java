@@ -274,7 +274,11 @@ public class SysUserServiceImpl implements ISysUserService
     @Override
     public boolean registerUser(SysUser user)
     {
-        return userMapper.insertUser(user) > 0;
+        Boolean total = userMapper.insertUser(user) > 0; //这个是插入到用户表中
+        //插入到角色表中，然后注意一下这个new Long[]{2L}，2L代表的含义是2是xx角色的id，L是Long长整型，这个样子是写死的，
+        insertUserRole(userMapper.selectUserByUserName(user.getUserName()).getUserId(),new Long[]{2L});
+        return total;
+        //return userMapper.insertUser(user) > 0; 原本存在的，可以删掉可以注释掉
     }
 
     /**
