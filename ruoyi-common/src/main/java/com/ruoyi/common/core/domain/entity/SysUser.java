@@ -89,9 +89,44 @@ public class SysUser extends BaseEntity
     /** 角色ID */
     private Long roleId;
 
+    private String vipNum;
+    private String vipCode;
+
+    private Date vipEndTime;
+
     public SysUser()
     {
 
+    }
+
+    public String getVipNum()
+    {
+        return vipNum;
+    }
+
+    public void setVipNum(String vipNum)
+    {
+        this.vipNum = vipNum;
+    }
+
+    public String getVipCode()
+    {
+        return vipCode;
+    }
+
+    public void setVipCode(String vipCode)
+    {
+        this.vipCode = vipCode;
+    }
+
+    public Date getVipEndTime()
+    {
+        return vipEndTime;
+    }
+
+    public void setVipEndTime(Date vipEndTime)
+    {
+        this.vipEndTime = vipEndTime;
     }
 
     public SysUser(Long userId)

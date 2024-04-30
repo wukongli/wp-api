@@ -1,8 +1,12 @@
 package com.ruoyi.web.controller.system;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletResponse;
+
+import cn.hutool.core.date.DateTime;
+import cn.hutool.core.date.DateUtil;
 import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -149,6 +153,10 @@ public class SysUserController extends BaseController
     @PutMapping
     public AjaxResult edit(@Validated @RequestBody SysUser user)
     {
+        if(user.getVipNum() != null && !Objects.equals(user.getVipNum(), "")){
+            DateTime dateTime = DateUtil.offsetDay(DateUtil.date(), Integer.parseInt(user.getVipNum()));
+            user.setVipEndTime(dateTime);
+        }
         userService.checkUserAllowed(user);
         userService.checkUserDataScope(user.getUserId());
         if (!userService.checkUserNameUnique(user))
